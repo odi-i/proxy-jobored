@@ -8,7 +8,7 @@ import {LRUCache} from "lru-cache";
 dotenv.config()
 
 const app = express();
-const port = process.env.PORT || 3001;
+const port = 3000;
 
 const cookiePerIP = new LRUCache({
     max: 1000,
@@ -24,7 +24,7 @@ app.use(cors({
 app.use(requestIp.mw());
 
 //@ts-ignore
-app.use('/', proxy(process.env.ORIGINAL_SERVER_URL, {
+app.use('/', proxy('https://api.superjob.ru', {
     https: true,
     userResHeaderDecorator(headers, userReq,) {
         const key = userReq.clientIp;
