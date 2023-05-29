@@ -16,10 +16,20 @@ const cookiePerIP = new LRUCache({
     updateAgeOnGet: false,
     updateAgeOnHas: false,
 });
+const allowList = ['http://localhost:3000','https://kirillapatski.github.io/', 'https://reni101.github.io']
 
-app.use(cors({
-    origin: true,
-}));
+const corsOptions = {
+    origin:(origin:any, callback:any)=> {
+        if (allowList.indexOf(origin) !== -1 || !origin) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    }
+};
+
+
+app.use(cors(corsOptions));
 
 app.use(requestIp.mw());
 
