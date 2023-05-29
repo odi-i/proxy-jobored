@@ -4,6 +4,7 @@ import * as dotenv from 'dotenv'
 import requestIp from 'request-ip';
 import cors from 'cors';
 import {LRUCache} from "lru-cache";
+
 dotenv.config()
 
 const app = express();
@@ -33,29 +34,28 @@ app.use('/', proxy(process.env.ORIGINAL_SERVER_URL, {
                 const [key, value] = c.split(';')[0].split('=');
                 return {key, value};
             });
+
+            const previousCookies = cookiePerIP.get(key!) || [];
 //@ts-ignore
-            const previousCookies = cookiePerIP.get(key) || [];
-            //@ts-ignore
             const currentCookies = previousCookies.concat(newCookies);
-//@ts-ignore
-            cookiePerIP.set(key, currentCookies);
+
+            cookiePerIP.set(key!, currentCookies);
         }
 
         return headers;
     },
     proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
         const key = srcReq.clientIp;
+
+        if (cookiePerIP.has(key!)) {
 //@ts-ignore
-        if (cookiePerIP.has(key)) {
-            //@ts-ignore
             const cookies = cookiePerIP
-                //@ts-ignore
-                .get(key)
+                .get(key!)
                 //@ts-ignore
                 .map(c => `${c.key}=${c.value}`)
                 .join(';')
-//@ts-ignore
-            proxyReqOpts.headers['cookie'] = cookies;
+
+            proxyReqOpts.headers!['cookie'] = cookies;
         }
 
         return proxyReqOpts;
@@ -71,15 +71,3 @@ app.use((err, _req, res, _next) => {
 app.listen(port, () => {
     console.log('Server started');
 });
-
-
-// app.get('/', (req: Request, res: Response) => {
-//     let helloItIncubator = 'Hello it-incubator!!!';
-//     res.send(helloItIncubator)
-// })
-//
-// app.listen(port, () => {
-//     console.log(`Example app listening on port ${port}`)
-// })
-// yarn nodemon --inspect dist/index.js
-//kill -9 $(lsof -tis:3000)
