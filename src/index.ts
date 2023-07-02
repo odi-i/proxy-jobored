@@ -16,7 +16,7 @@ const cookiePerIP = new LRUCache({
     updateAgeOnGet: false,
     updateAgeOnHas: false,
 });
-const allowList = ['http://localhost:3000','https://kirillapatski.github.io/', 'https://reni101.github.io']
+const allowList = ['http://localhost:5173/','https://papaya-entremet-3046cd.netlify.app']
 
 const corsOptions = {
     origin:(origin:any, callback:any)=> {
